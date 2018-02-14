@@ -1,0 +1,291 @@
+#ifndef COLLEGE_CC
+#define COLLEGE_CC
+#include "course.h"
+#include<iomanip>
+#include "node.h"
+#include"college.h"
+#include<string>
+#include<cstdlib>
+#include<iostream>
+using namespace std;
+////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+  void College::add(course& c)
+  {
+  node* tmp, *cursor, *previous;
+  tmp = new node;
+  cursor = head;
+  tmp -> set_data(c);
+  tmp -> set_link(NULL);
+  if(head == NULL)
+  {
+    head = tmp;
+    return;
+  }
+  if(head -> data() > c)
+  {
+    tmp -> set_link(head);
+    head = tmp;
+    return;
+
+  }
+  if (head-> link() == NULL)
+  {
+    head -> set_link(tmp);
+    return;
+  }
+    previous = head;
+    cursor = head -> link();
+    while (cursor!=NULL)
+    {
+      if(cursor -> data() > c)
+      {
+        previous -> set_link(tmp);
+        tmp -> set_link(cursor);
+        return;
+      }
+      previous = cursor;
+      cursor = cursor -> link();
+    }
+    previous-> set_link(tmp);
+  }
+////////////////////////////////////////////////////////////////////////////////
+void College::display(std::ostream& outs)
+{
+  node *cursor;
+  cursor = head;
+  while (cursor!=NULL)
+  {
+    outs << cursor -> data() << '\n';
+    cursor = cursor -> link();
+  }
+}
+////////////////////////////////////////////////////////////////////////////////
+College::College()
+{
+   head-> set_link(NULL);
+}
+////////////////////////////////////////////////////////////////////////////////
+void College::load(std::istream& ins)
+{
+  head = NULL;
+  course c;
+  node * tmp, *cursor;
+  cursor = head;
+  ins >> c;
+  while(!ins.eof())
+  {
+    tmp = new node;
+    tmp -> set_data(c);
+    tmp -> set_link(NULL);
+    if (head == NULL)
+    {
+      head = tmp;
+      cursor = head;
+    }
+    else
+    {
+      cursor -> set_link(tmp);
+      cursor = cursor -> link();
+    }
+    ins >> c;
+    tmp -> set_link(NULL);
+
+  }
+}
+////////////////////////////////////////////////////////////////////////////////
+College::~College()
+{
+  node *rmptr;
+  while (head != NULL)
+  {
+    rmptr = head;
+    head = head -> link();
+    if(head!= NULL)
+    {
+    delete rmptr;
+    }
+  }
+
+
+}
+////////////////////////////////////////////////////////////////////////////////
+void College::remove(std::string coursename)
+{
+  node* cursor, *previous;
+  cursor = head->link();
+  previous = head;
+  if(head == NULL)
+  {
+    return;
+  }
+  if (head -> data().get_course_number()  == coursename)
+  {
+    if(head ->link()!= NULL)
+    {
+    cursor = head;
+    head = head ->link();
+    delete cursor;
+    return;
+    }
+    else
+    {
+    delete head;
+    head = NULL;
+    }
+  }
+
+    while (cursor!= NULL)
+    {
+      if (cursor->data().get_course_number() == coursename)
+      {
+        if(cursor -> link()== NULL)
+        {
+          previous -> set_link(NULL);
+          delete cursor;
+          cursor = NULL;
+          return;
+        }
+        else
+        {
+          previous -> set_link(cursor->link());
+          delete cursor;
+          cursor ->set_link(previous ->link());
+          return;
+        }
+      }
+      if(cursor != NULL)
+      {
+      previous = cursor;
+      cursor = cursor ->link();
+      }
+    }
+
+
+}
+////////////////////////////////////////////////////////////////////////////////
+College::College(const College& Classes)
+{
+  node *rmptr;
+  if (Classes.head != NULL)
+  {
+    head = new node();
+    head -> set_data(Classes.head -> data());
+    const node * s_ptr = Classes.head;
+    node * d_ptr = head;
+    while(s_ptr != NULL)
+    {
+      s_ptr = s_ptr -> link();
+      if(s_ptr !=NULL)
+      {
+      d_ptr-> set_link(new node);
+      d_ptr = d_ptr -> link();
+      d_ptr-> set_data(s_ptr->data());
+      d_ptr -> set_link(NULL);
+      }
+    }
+  }
+}
+////////////////////////////////////////////////////////////////////////////////
+double College::hours()
+{
+  const node* const_ptr = head;
+  double hours = 0;
+  while(const_ptr!= NULL)
+  {
+    hours = const_ptr-> data().get_hours() + hours;
+    const_ptr = const_ptr -> link();
+  }
+  return hours;
+}
+////////////////////////////////////////////////////////////////////////////////
+void College:: save(ostream& outs)
+{
+  const node * const_ptr;
+  const_ptr= head;
+  while( const_ptr != NULL)
+  {
+
+    outs << const_ptr -> data();
+    if( const_ptr != NULL )
+    {
+    const_ptr= const_ptr-> link();
+    }
+  }
+}
+////////////////////////////////////////////////////////////////////////////////
+College&College:: operator = (const College & Classes)
+{
+  node *rmptr;
+  if( this == & Classes)
+  {
+    return *this;
+  }
+  while (head != NULL)
+  {
+    rmptr = head;
+    head -> link();
+    delete rmptr;
+  }
+  if (Classes.head != NULL)
+  {
+    head = new node(Classes.head->data());
+    const node * s_ptr = Classes.head;
+    node * d_ptr = head;
+    while(s_ptr != NULL)
+    {
+      s_ptr = s_ptr -> link();
+      d_ptr-> set_link(new node);
+      d_ptr = d_ptr -> link();
+      d_ptr-> data() = s_ptr->data();
+      d_ptr -> set_link(NULL);
+    }
+  }
+  return *this;
+}
+////////////////////////////////////////////////////////////////////////////////
+
+double College::gpa()
+{
+  const node* const_ptr = head;
+  double t_hours,sum,gpa;
+  t_hours = hours();
+  while(const_ptr!= NULL)
+  {
+    sum = (const_ptr-> data().get_hours() * const_ptr -> data().get_number_grade())
+    + sum;
+    const_ptr = const_ptr -> link();
+  }
+  gpa = sum/ t_hours;
+  return gpa;
+}
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+#endif
+////////////////////////////////////////////////////////////////////////////////
